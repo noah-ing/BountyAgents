@@ -1,0 +1,73 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+out/
+cache/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Transcripts (may contain sensitive data)
+transcripts/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Foundry
+contracts/out/
+contracts/cache/
+contracts/lib/
+
+# Docker
+.docker/
+
+# OS
+Thumbs.db
+*.bak
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Reports
+reports/*.json
+reports/*.html
+
+# Exploit outputs (sensitive!)
+exploits/
+*.exploit.sol
+
+# Test artifacts
+*.png
+test-dashboard.ts

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vulnerability Swarm</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+      background: #0d0d0d;
+      color: #a0a0a0;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #222;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 14px;
+      font-weight: normal;
+      color: #666;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 12px;
+      padding: 8px 16px;
+      border: 1px solid #333;
+      background: #1a1a1a;
+      color: #808080;
+      cursor: pointer;
+    }
+
+    button:hover:not(:disabled) {
+      background: #222;
+      color: #a0a0a0;
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    button.primary {
+      border-color: #2a4a2a;
+      color: #4a8;
+    }
+
+    button.primary:hover:not(:disabled) {
+      background: #1a2a1a;
+    }
+
+    button.danger {
+      border-color: #4a2a2a;
+      color: #a66;
+    }
+
+    button.danger:hover:not(:disabled) {
+      background: #2a1a1a;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 20px;
+      height: calc(100vh - 100px);
+    }
+
+    .panel {
+      background: #111;
+      border: 1px solid #222;
+    }
+
+    .panel-header {
+      padding: 10px 15px;
+      border-bottom: 1px solid #222;
+      display: flex;
+      justify-content: space-between;
+      color: #555;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .panel-body {
+      padding: 15px;
+      height: calc(100% - 40px);
+      overflow-y: auto;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      background: #111;
+      border: 1px solid #222;
+      padding: 15px;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      color: #ccc;
+      margin-bottom: 4px;
+    }
+
+    .stat-value.success { color: #4a8; }
+    .stat-value.warning { color: #a84; }
+    .stat-value.money { color: #aa8; }
+
+    .stat-label {
+      font-size: 10px;
+      color: #444;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 4px 8px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-idle { color: #555; }
+    .status-hunting { color: #4a8; }
+    .status-paused { color: #a84; }
+    .status-stopping { color: #a66; }
+
+    .target {
+      background: #0a0a0a;
+      border: 1px solid #222;
+      padding: 12px 15px;
+      margin-bottom: 15px;
+    }
+
+    .target-label {
+      font-size: 10px;
+      color: #444;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .target-name {
+      color: #888;
+    }
+
+    .log-entry {
+      padding: 8px 0;
+      border-bottom: 1px solid #1a1a1a;
+      font-size: 12px;
+    }
+
+    .log-entry:last-child {
+      border-bottom: none;
+    }
+
+    .log-time {
+      color: #333;
+      margin-right: 10px;
+    }
+
+    .log-stage {
+      color: #555;
+      margin-right: 10px;
+    }
+
+    .log-message {
+      color: #777;
+    }
+
+    .log-entry.success .log-message { color: #4a8; }
+    .log-entry.error .log-message { color: #a66; }
+    .log-entry.warn .log-message { color: #a84; }
+
+    .log-details {
+      color: #444;
+      margin-top: 4px;
+      padding-left: 90px;
+    }
+
+    .submission {
+      background: #0a0a0a;
+      border: 1px solid #222;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .submission-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .submission-title {
+      color: #888;
+    }
+
+    .submission-severity {
+      font-size: 10px;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border: 1px solid;
+    }
+
+    .severity-critical { color: #a66; border-color: #422; }
+    .severity-high { color: #a84; border-color: #432; }
+    .severity-medium { color: #aa8; border-color: #443; }
+    .severity-low { color: #888; border-color: #333; }
+
+    .submission-meta {
+      color: #444;
+      font-size: 11px;
+      margin-bottom: 8px;
+    }
+
+    .submission-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .submission-value {
+      color: #4a8;
+    }
+
+    .empty {
+      color: #333;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .credits {
+      margin-bottom: 15px;
+    }
+
+    .credits-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 11px;
+    }
+
+    .credits-label { color: #444; }
+    .credits-value { color: #666; }
+
+    .credits-bar {
+      height: 3px;
+      background: #1a1a1a;
+    }
+
+    .credits-fill {
+      height: 100%;
+      background: #333;
+      transition: width 0.3s;
+    }
+
+    .credits-fill.warning { background: #543; }
+    .credits-fill.danger { background: #533; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #111; }
+    ::-webkit-scrollbar-thumb { background: #222; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>vulnerability swarm</h1>
+      <div class="controls">
+        <button id="btn-start" class="primary">start</button>
+        <button id="btn-pause" disabled>pause</button>
+        <button id="btn-stop" class="danger" disabled>stop</button>
+      </div>
+    </header>
+
+    <div class="stats">
+      <div class="stat">
+        <div id="stat-status" class="status status-idle">idle</div>
+      </div>
+      <div class="stat">
+        <div id="stat-uptime" class="stat-value">00:00:00</div>
+        <div class="stat-label">uptime</div>
+      </div>
+      <div class="stat">
+        <div id="stat-hunts" class="stat-value">0</div>
+        <div class="stat-label">hunts</div>
+      </div>
+      <div class="stat">
+        <div id="stat-findings" class="stat-value">0</div>
+        <div class="stat-label">findings</div>
+      </div>
+    </div>
+
+    <div class="credits">
+      <div class="credits-header">
+        <span class="credits-label">credits</span>
+        <span id="credits-text" class="credits-value">$0.00 / $100.00</span>
+      </div>
+      <div class="credits-bar">
+        <div id="credits-fill" class="credits-fill" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <div id="current-target" class="target" style="display: none;">
+      <div class="target-label">hunting</div>
+      <div id="target-name" class="target-name">-</div>
+    </div>
+
+    <div class="grid">
+      <div class="panel">
+        <div class="panel-header">
+          <span>log</span>
+          <span id="log-count">0</span>
+        </div>
+        <div id="log-container" class="panel-body">
+          <div class="empty">waiting</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <span>submissions</span>
+          <span id="submission-count">0</span>
+        </div>
+        <div id="submissions-container" class="panel-body">
+          <div class="empty">no validated findings yet</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let state = {
+      status: 'idle',
+      currentTarget: null,
+      totalFindings: 0,
+      validatedFindings: 0,
+      creditsUsed: 0,
+      huntsSinceStart: 0,
+      uptime: 0,
+      logs: [],
+      submissions: [],
+    };
+
+    let ws;
+    function connect() {
+      ws = new WebSocket(`ws://${window.location.host}`);
+      ws.onopen = () => console.log('connected');
+      ws.onmessage = (e) => handleMessage(JSON.parse(e.data));
+      ws.onclose = () => setTimeout(connect, 2000);
+    }
+    connect();
+
+    function handleMessage(msg) {
+      switch (msg.type) {
+        case 'init': state = msg.state; renderAll(); break;
+        case 'status': state.status = msg.status; renderStatus(); updateButtons(); break;
+        case 'uptime': state.uptime = msg.uptime; renderUptime(); break;
+        case 'log': state.logs.unshift(msg.log); renderLogs(); break;
+        case 'submission': state.submissions.unshift(msg.submission); renderSubmissions(); break;
+        case 'state_update': Object.assign(state, msg.update); renderStats(); break;
+      }
+    }
+
+    function renderAll() {
+      renderStatus();
+      renderUptime();
+      renderStats();
+      renderLogs();
+      renderSubmissions();
+      updateButtons();
+    }
+
+    function renderStatus() {
+      const el = document.getElementById('stat-status');
+      el.className = `status status-${state.status}`;
+      el.textContent = state.status;
+
+      const target = document.getElementById('current-target');
+      if (state.currentTarget) {
+        target.style.display = 'block';
+        document.getElementById('target-name').textContent = state.currentTarget;
+      } else {
+        target.style.display = 'none';
+      }
+    }
+
+    function renderUptime() {
+      const h = Math.floor(state.uptime / 3600);
+      const m = Math.floor((state.uptime % 3600) / 60);
+      const s = state.uptime % 60;
+      document.getElementById('stat-uptime').textContent =
+        `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+    }
+
+    function renderStats() {
+      document.getElementById('stat-hunts').textContent = state.huntsSinceStart;
+      document.getElementById('stat-findings').textContent = state.totalFindings;
+
+      const pct = (state.creditsUsed / 100) * 100;
+      document.getElementById('credits-text').textContent = `$${state.creditsUsed.toFixed(2)} / $100.00`;
+      const fill = document.getElementById('credits-fill');
+      fill.style.width = `${pct}%`;
+      fill.className = 'credits-fill' + (pct > 90 ? ' danger' : pct > 70 ? ' warning' : '');
+    }
+
+    function renderLogs() {
+      const c = document.getElementById('log-container');
+      document.getElementById('log-count').textContent = state.logs.length;
+      if (!state.logs.length) { c.innerHTML = '<div class="empty">waiting</div>'; return; }
+      c.innerHTML = state.logs.slice(0, 100).map(l => `
+        <div class="log-entry ${l.level}">
+          <span class="log-time">${new Date(l.timestamp).toLocaleTimeString()}</span>
+          <span class="log-stage">[${l.stage}]</span>
+          <span class="log-message">${l.message}</span>
+          ${l.details ? `<div class="log-details">${l.details}</div>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function renderSubmissions() {
+      const c = document.getElementById('submissions-container');
+      const pending = state.submissions.filter(s => s.status === 'pending').length;
+      document.getElementById('submission-count').textContent = pending;
+      if (!state.submissions.length) { c.innerHTML = '<div class="empty">no validated findings yet</div>'; return; }
+      c.innerHTML = state.submissions.map(s => `
+        <div class="submission">
+          <div class="submission-header">
+            <span class="submission-title">${s.vulnerability}</span>
+            <span class="submission-severity severity-${s.severity.toLowerCase()}">${s.severity}</span>
+          </div>
+          <div class="submission-meta">${s.program}</div>
+          <div class="submission-footer">
+            <span class="submission-value">$${s.bountyValue.toLocaleString()}</span>
+            ${s.status === 'pending'
+              ? `<button onclick="submitFinding('${s.id}')">submit</button>`
+              : `<span class="status">${s.status}</span>`}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateButtons() {
+      document.getElementById('btn-start').disabled = state.status === 'hunting' || state.status === 'stopping';
+      document.getElementById('btn-pause').disabled = state.status !== 'hunting' && state.status !== 'paused';
+      document.getElementById('btn-stop').disabled = state.status === 'idle' || state.status === 'stopping';
+      document.getElementById('btn-pause').textContent = state.status === 'paused' ? 'resume' : 'pause';
+    }
+
+    document.getElementById('btn-start').onclick = () => fetch('/api/start', { method: 'POST' });
+    document.getElementById('btn-pause').onclick = () => fetch(state.status === 'paused' ? '/api/resume' : '/api/pause', { method: 'POST' });
+    document.getElementById('btn-stop').onclick = () => fetch('/api/stop', { method: 'POST' });
+    function submitFinding(id) { fetch(`/api/submission/${id}/submit`, { method: 'POST' }); }
+  </script>
+</body>
+</html>

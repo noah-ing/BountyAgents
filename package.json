@@ -1,0 +1,66 @@
+{
+  "name": "bounty-agents",
+  "version": "0.1.0",
+  "description": "The Vulnerability Swarm - An army of Claude Opus 4.5 agents that debate, argue, challenge, and synthesize their way to finding vulnerabilities",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "bounty-hunt": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "tsx src/dashboard.ts",
+    "dashboard": "tsx src/dashboard.ts",
+    "dev": "tsx src/index.ts",
+    "demo": "tsx src/demo.ts",
+    "hunt:real": "tsx src/hunt-real.ts",
+    "hunt": "tsx src/index.ts hunt",
+    "scout": "tsx src/index.ts scout",
+    "analyze": "tsx src/index.ts analyze",
+    "status": "tsx src/index.ts status",
+    "test": "vitest",
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.52.0",
+    "blessed": "^0.1.81",
+    "blessed-contrib": "^4.11.0",
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "dockerode": "^4.0.2",
+    "dotenv": "^16.4.5",
+    "express": "^5.2.1",
+    "ora": "^8.0.1",
+    "p-limit": "^6.1.0",
+    "playwright": "^1.57.0",
+    "uuid": "^13.0.0",
+    "viem": "^2.21.0",
+    "ws": "^8.18.3",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/blessed": "^0.1.27",
+    "@types/dockerode": "^3.3.31",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.0.0",
+    "@types/uuid": "^10.0.0",
+    "@types/ws": "^8.18.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "bug-bounty",
+    "smart-contracts",
+    "security",
+    "ai-agents",
+    "claude",
+    "vulnerability-detection"
+  ],
+  "author": "",
+  "license": "MIT"
+}
